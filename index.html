@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#071525">
+<meta name="description" content="An animated, interactive presentation about Prince Edward Island, Canada.">
+<title>Prince Edward Island — Interactive Presentation</title>
+<style>
+:root{--ink:#13243a;--navy:#071525;--navy2:#0b2034;--blue:#0284c7;--cyan:#56c8ed;--pale:#dff5ff;--muted:#91a6ba;--line:rgba(255,255,255,.12);--shadow:0 24px 80px rgba(0,0,0,.34)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--navy);color:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+body{min-height:100vh;overflow-x:hidden;background:radial-gradient(ellipse at 14% 12%,rgba(0,126,184,.2),transparent 35%),radial-gradient(ellipse at 88% 83%,rgba(16,100,137,.16),transparent 38%),linear-gradient(140deg,#061321,#0a1d31 56%,#071525)}
+button{font:inherit}
+.ambient{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.ambient:before,.ambient:after{content:"";position:absolute;width:65vw;height:65vw;min-width:560px;min-height:560px;border:1px solid rgba(106,211,244,.10);border-radius:44%;filter:blur(.2px);animation:orbit 32s linear infinite;left:-22vw;top:30vh;transform:rotate(0deg)}
+.ambient:after{width:48vw;height:48vw;left:64vw;top:-24vw;border-color:rgba(106,211,244,.08);animation-duration:42s;animation-direction:reverse}
+@keyframes orbit{to{transform:rotate(360deg) translateY(-18px)}}
+.shell{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:22px clamp(14px,3vw,44px) 18px;min-height:100vh;display:flex;flex-direction:column;gap:16px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:52px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#2bb6df,#0879ae);display:grid;place-items:center;box-shadow:0 7px 22px rgba(0,153,205,.25);flex:none}
+.brand-mark svg{width:23px;height:23px}
+.brand-copy{min-width:0}.brand-title{font-size:13px;font-weight:850;letter-spacing:.13em;text-transform:uppercase;color:#effaff}.brand-sub{font-size:11px;color:#88a2b9;margin-top:2px}
+.top-actions{display:flex;gap:8px;align-items:center}
+.top-btn{border:1px solid var(--line);background:rgba(255,255,255,.035);color:#dcecf7;border-radius:10px;padding:9px 12px;font-size:11px;font-weight:750;letter-spacing:.04em;cursor:pointer;transition:.2s}
+.top-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(112,205,240,.35);transform:translateY(-1px)}
+.top-btn .ico{font-size:14px;margin-right:6px;color:#70d4f5}
+.presentation{width:100%;display:flex;flex-direction:column;gap:14px;flex:1;justify-content:center;min-height:0}
+.stage{position:relative;width:100%;aspect-ratio:16/9;max-height:calc(100vh - 188px);min-height:300px;background:#0a1b2e;border:1px solid rgba(145,204,228,.24);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);isolation:isolate}
+.stage:before{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(130deg,rgba(13,55,78,.4),transparent 48%,rgba(4,18,33,.28));pointer-events:none}
+.slide-layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transform:translateX(22px) scale(.992);transition:opacity .42s ease,transform .55s cubic-bezier(.2,.75,.2,1),visibility .42s}
+.slide-layer.active{opacity:1;visibility:visible;transform:translateX(0) scale(1);z-index:2}
+.slide-layer.exit-left{transform:translateX(-28px) scale(.99);opacity:0}
+.slide-image{width:100%;height:100%;object-fit:contain;display:block;background:#f7fafc;animation:photoReveal .8s cubic-bezier(.2,.7,.2,1) both}
+@keyframes photoReveal{from{opacity:.45;transform:scale(1.025);filter:saturate(.7)}to{opacity:1;transform:scale(1);filter:saturate(1)}}
+.slide-tag{position:absolute;bottom:16px;right:18px;padding:7px 10px;border:1px solid rgba(255,255,255,.15);border-radius:9px;color:#eaf9ff;background:rgba(5,20,35,.72);backdrop-filter:blur(10px);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;z-index:5}
+/* Interactive graph slide */
+.chart-slide{width:100%;height:100%;background:linear-gradient(135deg,#f7fbff,#eaf4fa);color:var(--ink);padding:clamp(16px,3vw,38px) clamp(15px,3.4vw,46px) clamp(13px,2vw,24px);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.chart-slide:before{content:"";position:absolute;right:-9%;top:-36%;width:40%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(2,132,199,.11),rgba(2,132,199,0) 68%);pointer-events:none}
+.chart-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;position:relative;z-index:1}
+.chart-eyebrow{font-size:clamp(8px,.8vw,11px);letter-spacing:.17em;text-transform:uppercase;color:#647a90;font-weight:850;margin-bottom:6px}
+.chart-title{font-size:clamp(18px,2.4vw,31px);line-height:1.1;letter-spacing:-.04em;margin:0;color:#14263d;font-weight:850}
+.chart-subtitle{font-size:clamp(9px,1vw,13px);color:#71839a;margin-top:6px}
+.chart-stat{background:#e4f5fd;border:1px solid #c8eaf8;padding:10px 14px;border-radius:13px;text-align:right;flex:none;min-width:140px}
+.chart-stat strong{display:block;font-size:clamp(17px,2.1vw,26px);line-height:1;color:#075985;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.chart-stat span{display:block;margin-top:5px;color:#5e7c91;font-size:8px;font-weight:850;letter-spacing:.12em;text-transform:uppercase}
+.chart-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:clamp(10px,1.5vw,20px) 0 0;position:relative;z-index:2}
+.ranges{display:flex;gap:4px;flex-wrap:wrap}
+.range{border:0;background:transparent;color:#465970;border-radius:8px;padding:7px 10px;font-size:clamp(9px,.95vw,12px);font-weight:800;cursor:pointer;transition:background .18s,color .18s,transform .18s}
+.range:hover{background:#e4edf4}.range:active{transform:scale(.95)}.range.active{background:#d9f0fc;color:#036b9e;box-shadow:inset 0 0 0 1px rgba(2,132,199,.08)}
+.chart-hint{color:#8b9aab;font-size:clamp(8px,.75vw,10px);text-align:right}
+.chart-wrap{position:relative;flex:1;min-height:0;margin-top:1px}
+.chart-svg{width:100%;height:100%;display:block;overflow:visible;touch-action:none;user-select:none}
+.gridline{stroke:#cfd9e3;stroke-width:1;stroke-dasharray:2.5 4}.axis-text{fill:#667a91;font-size:11px}.axis-title{fill:#52677d;font-size:11px;font-weight:800;letter-spacing:.08em}
+.series{fill:none;stroke:#0284c7;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.crosshair{stroke:#93a5b8;stroke-width:1;stroke-dasharray:4 4;pointer-events:none;opacity:0}.focus-dot{fill:white;stroke:#0284c7;stroke-width:3;opacity:0;pointer-events:none}
+.hit-area{fill:transparent;cursor:crosshair}.selection{fill:#94a3b8;fill-opacity:.2;stroke:#64748b;stroke-width:1;stroke-dasharray:3 3;display:none;pointer-events:none}
+.tooltip{position:absolute;z-index:4;display:none;min-width:128px;padding:10px 12px;border-radius:10px;background:#101827;color:white;box-shadow:0 8px 24px rgba(5,15,35,.2);font-size:11px;pointer-events:none;transform:translate(10px,-50%)}
+.tooltip .year{font-size:15px;font-weight:850;line-height:1.1;margin-bottom:4px}.tooltip .value{font-weight:700;color:#dce6ef}
+.chart-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:5px;color:#7b8da1;font-size:clamp(7px,.72vw,9px);flex-wrap:wrap}
+.chart-source{display:flex;gap:10px;flex-wrap:wrap}.chart-source a{color:#38718f;text-decoration:none}.chart-source a:hover{text-decoration:underline}
+.chart-reset{border:1px solid #d8e2eb;border-radius:8px;padding:6px 9px;background:#fff;color:#4c6278;font-size:10px;font-weight:750;cursor:pointer}.chart-reset:hover{background:#f2f7fa}
+.controls{display:flex;align-items:center;gap:12px;min-height:48px}
+.nav-btn{width:42px;height:42px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.045);color:#e8f6fd;display:grid;place-items:center;cursor:pointer;transition:.2s;flex:none}
+.nav-btn:hover:not(:disabled){border-color:rgba(112,205,240,.5);background:rgba(33,143,185,.17);transform:translateY(-2px)}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed}.nav-btn svg{width:18px;height:18px}
+.progress-wrap{flex:1;min-width:60px;display:flex;align-items:center;gap:12px}
+.progress-track{height:4px;background:rgba(255,255,255,.11);border-radius:99px;overflow:hidden;flex:1;position:relative}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#078bc6,#6ee0ff);border-radius:99px;transition:width .45s cubic-bezier(.2,.7,.2,1);box-shadow:0 0 12px rgba(41,183,228,.5)}
+.slide-count{font-size:11px;font-weight:800;letter-spacing:.12em;color:#b7c9d8;white-space:nowrap;font-variant-numeric:tabular-nums}.slide-count .current{color:#6bd6f6}
+.keyboard-help{font-size:10px;color:#7891a8;white-space:nowrap}
+.footer-note{display:flex;justify-content:space-between;align-items:center;color:#718ba1;font-size:10px;padding:0 2px;gap:12px}
+.footer-note strong{color:#aac4d8;font-weight:750}
+@media(max-width:760px){.shell{padding:12px;gap:10px}.topbar{min-height:42px}.brand-mark{width:33px;height:33px}.brand-title{font-size:11px}.brand-sub{font-size:9px}.top-btn{padding:8px 9px;font-size:10px}.top-btn .ico{margin:0}.top-btn span.label{display:none}.stage{min-height:220px;max-height:calc(100vh - 145px);border-radius:12px}.chart-slide{padding:13px 13px 10px}.chart-stat{min-width:104px;padding:8px 9px}.chart-hint{display:none}.chart-toolbar{margin-top:8px}.range{padding:6px 7px}.chart-footer{padding-top:2px}.controls{min-height:40px;gap:8px}.nav-btn{width:36px;height:36px;border-radius:11px}.keyboard-help{display:none}.footer-note{font-size:9px}.slide-tag{bottom:8px;right:8px;font-size:8px;padding:5px 7px}}
+@media(max-width:470px){.brand-sub{display:none}.top-actions{gap:5px}.chart-header{gap:8px}.chart-stat{min-width:92px}.chart-stat strong{font-size:16px}.chart-stat span{font-size:7px}.chart-subtitle{max-width:190px}.chart-toolbar{align-items:flex-start}.chart-footer .chart-source{gap:6px}.slide-tag{display:none}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 15.5c2.1-1.8 4.2-1.8 6.3 0s4.2 1.8 6.3 0 4.2-1.8 6.4 0M3 10.5c2.1-1.8 4.2-1.8 6.3 0s4.2 1.8 6.3 0 4.2-1.8 6.4 0M5 5.5c1.7-1.3 3.3-1.3 5 0s3.3 1.3 5 0" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+      <div class="brand-copy"><div class="brand-title">Prince Edward Island</div><div class="brand-sub">An interactive presentation · Canada</div></div>
+    </div>
+    <div class="top-actions">
+      <button class="top-btn" id="overviewBtn" title="Open slide overview"><span class="ico">▦</span><span class="label">OVERVIEW</span></button>
+      <button class="top-btn" id="fullscreenBtn" title="Toggle fullscreen"><span class="ico">⛶</span><span class="label">FULLSCREEN</span></button>
+    </div>
+  </header>
+
+  <main class="presentation">
+    <section class="stage" id="stage" aria-label="Presentation slide viewer">
+      <div class="slide-layer active" data-index="0"><img class="slide-image" src="assets/source-01.webp" alt="Prince Edward Island title slide"><span class="slide-tag">01 · Introduction</span></div>
+      <div class="slide-layer" data-index="1"><img class="slide-image" src="assets/source-02.webp" alt="General Information summary slide"><span class="slide-tag">02 · Overview</span></div>
+      <div class="slide-layer" data-index="2"><img class="slide-image" src="assets/source-03.webp" alt="Prince Edward Island general information section"><span class="slide-tag">03 · General Information</span></div>
+
+      <div class="slide-layer" data-index="3" id="chartSlide">
+        <section class="chart-slide" aria-label="Interactive PEI population chart">
+          <div class="chart-header">
+            <div><div class="chart-eyebrow">Population history · Canada</div><h1 class="chart-title">Prince Edward Island</h1><div class="chart-subtitle">Population over time · 1851–2026</div></div>
+            <div class="chart-stat"><strong>182,989</strong><span>Estimated · July 1, 2026</span></div>
+          </div>
+          <div class="chart-toolbar">
+            <div class="ranges" id="ranges" aria-label="Choose chart time range">
+              <button class="range active" data-range="all" aria-pressed="true">All</button>
+              <button class="range" data-range="10" aria-pressed="false">10Y</button>
+              <button class="range" data-range="25" aria-pressed="false">25Y</button>
+              <button class="range" data-range="50" aria-pressed="false">50Y</button>
+              <button class="range" data-range="100" aria-pressed="false">100Y</button>
+            </div>
+            <div class="chart-hint">Hover or tap the line · Drag to zoom · Double-click to reset</div>
+          </div>
+          <div class="chart-wrap" id="chartWrap">
+            <div class="tooltip" id="tooltip" role="status" aria-live="polite"><div class="year" id="tipYear">1888</div><div class="value" id="tipValue">Population: 109K</div></div>
+            <svg class="chart-svg" id="chart" viewBox="0 0 960 465" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Interactive line graph showing Prince Edward Island population from 1851 to 2026">
+              <defs><clipPath id="plotClip"><rect x="76" y="26" width="854" height="364"/></clipPath></defs>
+              <g id="grid"></g><g id="axes"></g>
+              <g clip-path="url(#plotClip)"><path id="line" class="series" d=""/><line id="crosshair" class="crosshair" x1="76" x2="76" y1="26" y2="390"/><circle id="focusDot" class="focus-dot" r="5.5" cx="76" cy="390"/><rect id="selection" class="selection" x="76" y="26" width="0" height="364"/><rect id="hitArea" class="hit-area" x="76" y="26" width="854" height="364"/></g>
+            </svg>
+          </div>
+          <div class="chart-footer"><span>Census counts with interpolated values between census years; July 1, 2026 estimate is preliminary.</span><span class="chart-source"><a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810001701" target="_blank" rel="noopener">Statistics Canada · Census counts</a><a href="https://www150.statcan.gc.ca/n1/daily-quotidien/260923/dq260923b-eng.htm" target="_blank" rel="noopener">2026 estimate</a></span><button class="chart-reset" id="resetChart">Reset view</button></div>
+        </section>
+        <span class="slide-tag">04 · Interactive population chart</span>
+      </div>
+
+      <div class="slide-layer" data-index="4"><img class="slide-image" src="assets/source-04.webp" alt="Charlottetown, capital city of Prince Edward Island"><span class="slide-tag">05 · Capital City</span></div>
+      <div class="slide-layer" data-index="5"><img class="slide-image" src="assets/source-05.webp" alt="Prince Edward Island population information"><span class="slide-tag">06 · Population</span></div>
+      <div class="slide-layer" data-index="6"><img class="slide-image" src="assets/source-06.webp" alt="Prince Edward Island land area"><span class="slide-tag">07 · Land Area</span></div>
+      <div class="slide-layer" data-index="7"><img class="slide-image" src="assets/source-07.webp" alt="When Prince Edward Island joined Canada"><span class="slide-tag">08 · Confederation</span></div>
+      <div class="slide-layer" data-index="8"><img class="slide-image" src="assets/source-08.webp" alt="Location of Prince Edward Island in Canada"><span class="slide-tag">09 · Location</span></div>
+      <div class="slide-layer" data-index="9"><img class="slide-image" src="assets/source-09.webp" alt="Neighbouring provinces of Prince Edward Island"><span class="slide-tag">10 · Neighbours</span></div>
+      <div class="slide-layer" data-index="10"><img class="slide-image" src="assets/source-10.webp" alt="Languages spoken in Prince Edward Island"><span class="slide-tag">11 · Languages</span></div>
+      <div class="slide-layer" data-index="11"><img class="slide-image" src="assets/source-11.webp" alt="Nicknames and slogans of Prince Edward Island"><span class="slide-tag">12 · Nicknames</span></div>
+      <div class="slide-layer" data-index="12"><img class="slide-image" src="assets/source-12.webp" alt="Part 2 historical information section"><span class="slide-tag">13 · History</span></div>
+      <div class="slide-layer" data-index="13"><img class="slide-image" src="assets/source-13.webp" alt="The Mi’kmaq, original Indigenous peoples of the region"><span class="slide-tag">14 · Mi’kmaq</span></div>
+      <div class="slide-layer" data-index="14"><img class="slide-image" src="assets/source-14.webp" alt="Prince Edward Island before European settlement"><span class="slide-tag">15 · Before Settlement</span></div>
+      <div class="slide-layer" data-index="15"><img class="slide-image" src="assets/source-15.webp" alt="Jacques Cartier and the first European arrival"><span class="slide-tag">16 · European Arrival</span></div>
+      <div class="slide-layer" data-index="16"><img class="slide-image" src="assets/source-28.webp" alt="Economy and Natural Resources section title"><span class="slide-tag">17 · Economy</span></div>
+      <div class="slide-layer" data-index="17"><img class="slide-image" src="assets/source-47.webp" alt="Sources used in the original presentation"><span class="slide-tag">18 · Sources</span></div>
+    </section>
+
+    <nav class="controls" aria-label="Presentation controls">
+      <button class="nav-btn" id="prevBtn" aria-label="Previous slide" title="Previous slide (←)"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="progress-wrap"><div class="progress-track" aria-label="Presentation progress"><div class="progress-fill" id="progressFill"></div></div><div class="slide-count"><span class="current" id="currentSlide">01</span> / <span id="totalSlides">18</span></div></div>
+      <span class="keyboard-help">Use ← → or Space</span>
+      <button class="nav-btn" id="nextBtn" aria-label="Next slide" title="Next slide (→)"><svg viewBox="0 0 24 24" fill="none"><path d="m9 5 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </nav>
+  </main>
+  <footer class="footer-note"><span><strong>PEI · Prince Edward Island</strong> &nbsp;|&nbsp; Interactive web presentation</span><span>Built for GitHub Pages</span></footer>
+</div>
+
+<div class="overview" id="overview" aria-hidden="true">
+ <div class="overview-panel"><div class="overview-head"><div><div class="overview-title">Slide overview</div><div class="overview-sub">Choose a slide to jump to it</div></div><button id="closeOverview" class="close-overview" aria-label="Close overview">✕</button></div><div class="overview-grid" id="overviewGrid"></div></div>
+</div>
+<style>
+.overview{position:fixed;inset:0;background:rgba(2,10,18,.76);backdrop-filter:blur(14px);z-index:20;display:none;align-items:center;justify-content:center;padding:18px}.overview.open{display:flex;animation:fadeOverlay .22s ease both}
+@keyframes fadeOverlay{from{opacity:0}to{opacity:1}}
+.overview-panel{width:min(1080px,100%);max-height:min(800px,90vh);overflow:auto;background:#0b2034;border:1px solid rgba(144,207,232,.22);border-radius:18px;padding:22px;box-shadow:0 30px 100px rgba(0,0,0,.5)}
+.overview-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.overview-title{font-size:19px;font-weight:850}.overview-sub{font-size:11px;color:#89a5bb;margin-top:4px}.close-overview{border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#e7f4fc;border-radius:9px;width:34px;height:34px;cursor:pointer}
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}.overview-card{background:#102b43;border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:7px;text-align:left;cursor:pointer;color:#eaf6fd;transition:.2s}.overview-card:hover,.overview-card.selected{border-color:#38bce9;transform:translateY(-2px);background:#153b58}.overview-thumb{height:94px;border-radius:7px;overflow:hidden;background:#edf5fa;display:flex;align-items:center;justify-content:center}.overview-thumb img{width:100%;height:100%;object-fit:cover}.overview-thumb .chart-mini{width:100%;height:100%;background:linear-gradient(140deg,#f1f8fc,#dfedf6);color:#17688e;display:grid;place-items:center;font-size:23px;font-weight:900}.overview-caption{display:flex;justify-content:space-between;gap:6px;padding:9px 3px 2px;font-size:10px;font-weight:750}.overview-caption span:first-child{color:#8bb1ca}
+@media(max-width:600px){.overview-panel{padding:14px}.overview-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.overview-thumb{height:70px}}
+</style>
+<script>
+(() => {
+  'use strict';
+  const layers=[...document.querySelectorAll('.slide-layer')];
+  const total=layers.length;
+  let current=0;
+  const stage=document.getElementById('stage');
+  const prev=document.getElementById('prevBtn'), next=document.getElementById('nextBtn');
+  const fill=document.getElementById('progressFill'), currentEl=document.getElementById('currentSlide');
+  const overview=document.getElementById('overview'), grid=document.getElementById('overviewGrid');
+  const pad=n=>String(n).padStart(2,'0');
+  document.getElementById('totalSlides').textContent=pad(total);
+  const titles=['Introduction','General Information','General Information','Population chart','Capital city','Population','Land area','Confederation','Location','Neighbours','Languages','Nicknames & slogans','Part 2','Mi’kmaq','Before settlement','European arrival','Economy & resources','Sources'];
+
+  function updateControls(){
+    prev.disabled=current===0; next.disabled=current===total-1;
+    currentEl.textContent=pad(current+1);fill.style.width=((current+1)/total*100)+'%';
+    [...grid.children].forEach((c,i)=>c.classList.toggle('selected',i===current));
+  }
+  function showSlide(index,fromPicker=false){
+    const target=Math.max(0,Math.min(total-1,index)); if(target===current)return;
+    const direction=target>current?1:-1;
+    const old=layers[current], fresh=layers[target];
+    old.classList.remove('active'); old.classList.toggle('exit-left',direction>0);
+    fresh.style.transform=direction>0?'translateX(22px) scale(.992)':'translateX(-22px) scale(.992)';
+    fresh.classList.add('active');
+    requestAnimationFrame(()=>{fresh.style.transform='';});
+    window.setTimeout(()=>old.classList.remove('exit-left'),470);
+    current=target; updateControls();
+    if(current===3 && window.PEIChart) window.PEIChart.refresh();
+    if(fromPicker) closeOverview();
+    history.replaceState(null,'','#slide-'+(current+1));
+  }
+  function openOverview(){overview.classList.add('open');overview.setAttribute('aria-hidden','false');}
+  function closeOverview(){overview.classList.remove('open');overview.setAttribute('aria-hidden','true');}
+  layers.forEach((layer,i)=>{
+    const card=document.createElement('button');card.className='overview-card'+(i===0?' selected':'');card.type='button';
+    const thumb=document.createElement('div');thumb.className='overview-thumb';
+    if(i===3){const mini=document.createElement('div');mini.className='chart-mini';mini.textContent='↗';thumb.appendChild(mini)}
+    else{const im=document.createElement('img');im.src=layer.querySelector('img').src;im.alt='';thumb.appendChild(im)}
+    const cap=document.createElement('div');cap.className='overview-caption';cap.innerHTML='<span>'+pad(i+1)+'</span><span>'+titles[i]+'</span>';
+    card.append(thumb,cap);card.addEventListener('click',()=>showSlide(i,true));grid.appendChild(card);
+  });
+  prev.addEventListener('click',()=>showSlide(current-1));next.addEventListener('click',()=>showSlide(current+1));
+  document.getElementById('overviewBtn').addEventListener('click',openOverview);
+  document.getElementById('closeOverview').addEventListener('click',closeOverview);
+  overview.addEventListener('click',e=>{if(e.target===overview)closeOverview()});
+  document.addEventListener('keydown',e=>{
+    if(overview.classList.contains('open')){if(e.key==='Escape')closeOverview();return;}
+    if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();showSlide(current+1)}
+    else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();showSlide(current-1)}
+    else if(e.key==='Home'){e.preventDefault();showSlide(0)}
+    else if(e.key==='End'){e.preventDefault();showSlide(total-1)}
+    else if(e.key.toLowerCase()==='f'){toggleFullscreen()}
+  });
+  let touchStart=null;
+  stage.addEventListener('touchstart',e=>{if(e.target.closest('.chart-slide,button,a')){touchStart=null;return;}if(e.touches.length===1)touchStart={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
+  stage.addEventListener('touchend',e=>{if(!touchStart)return;const dx=e.changedTouches[0].clientX-touchStart.x,dy=e.changedTouches[0].clientY-touchStart.y;if(Math.abs(dx)>65&&Math.abs(dx)>Math.abs(dy)*1.25){showSlide(current+(dx<0?1:-1));}touchStart=null},{passive:true});
+  function toggleFullscreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.();}
+  document.getElementById('fullscreenBtn').addEventListener('click',toggleFullscreen);
+  const hash=location.hash.match(/slide-(\d+)/); if(hash)current=Math.max(0,Math.min(total-1,Number(hash[1])-1));
+  layers.forEach((el,i)=>el.classList.toggle('active',i===current));updateControls();
+
+  // Interactive population chart: range controls, live tooltip, drag-to-zoom.
+  const data=[[1851,62678],[1861,80857],[1871,94021],[1881,108891],[1891,109078],[1901,103259],[1911,93728],[1921,88615],[1931,88038],[1941,95047],[1951,98429],[1956,99285],[1961,104629],[1966,108535],[1971,111635],[1976,118225],[1981,122506],[1986,126640],[1991,129765],[1996,134557],[2001,135294],[2006,138581],[2011,140204],[2016,142907],[2021,154331],[2026,182989]];
+  const svg=document.getElementById('chart'),wrap=document.getElementById('chartWrap'),gridEl=document.getElementById('grid'),axes=document.getElementById('axes'),line=document.getElementById('line'),hit=document.getElementById('hitArea'),cross=document.getElementById('crosshair'),dot=document.getElementById('focusDot'),tip=document.getElementById('tooltip'),tipYear=document.getElementById('tipYear'),tipValue=document.getElementById('tipValue'),selection=document.getElementById('selection');
+  if(svg){
+    const X0=76,X1=930,Y0=26,Y1=390,W=X1-X0,H=Y1-Y0,MIN=60000,MAX=190000,START=1851,END=2026;
+    let rangeStart=START,rangeEnd=END,dragStart=null,dragging=false,drawnOnce=false;
+    const fmt=n=>Math.round(n).toLocaleString('en-CA'),short=n=>`${Math.round(n/1000)}K`,xFor=y=>X0+(y-rangeStart)/(rangeEnd-rangeStart)*W,yFor=p=>Y1-(p-MIN)/(MAX-MIN)*H;
+    const interpolate=year=>{if(year<=data[0][0])return data[0][1];if(year>=data.at(-1)[0])return data.at(-1)[1];let i=0;while(i<data.length-1&&data[i+1][0]<year)i++;const [y0,p0]=data[i],[y1,p1]=data[i+1];return p0+(p1-p0)*(year-y0)/(y1-y0)};
+    const points=()=>{const pts=[[rangeStart,interpolate(rangeStart)]];data.forEach(([yr,p])=>{if(yr>rangeStart&&yr<rangeEnd)pts.push([yr,p])});pts.push([rangeEnd,interpolate(rangeEnd)]);return pts.map(([yr,p])=>({year:yr,pop:p,x:xFor(yr),y:yFor(p)}))};
+    function smoothPath(pts){if(pts.length<2)return '';let d=`M ${pts[0].x.toFixed(2)} ${pts[0].y.toFixed(2)}`;for(let i=0;i<pts.length-1;i++){const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];const c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6,c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;d+=` C ${c1x.toFixed(2)} ${c1y.toFixed(2)}, ${c2x.toFixed(2)} ${c2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`}return d}
+    function make(tag,attrs,text){const n=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));if(text!==undefined)n.textContent=text;return n}
+    function hideTip(){tip.style.display='none';cross.style.opacity='0';dot.style.opacity='0'}
+    function draw(animate=true){gridEl.replaceChildren();axes.replaceChildren();for(let p=60000;p<=190000;p+=10000){const y=yFor(p);gridEl.append(make('line',{x1:X0,x2:X1,y1:y,y2:y,class:'gridline'}));axes.append(make('text',{x:X0-13,y:y+4,'text-anchor':'end',class:'axis-text'},`${p/1000}K`))}let step=25;const span=rangeEnd-rangeStart;if(span<=12)step=2;else if(span<=30)step=5;else if(span<=55)step=10;else if(span<=110)step=20;const first=Math.ceil(rangeStart/step)*step;for(let yr=first;yr<=rangeEnd;yr+=step){const x=xFor(yr);axes.append(make('line',{x1:x,x2:x,y1:Y1,y2:Y1+5,stroke:'#9aa8ba','stroke-width':'1'}));axes.append(make('text',{x,y:Y1+24,'text-anchor':'middle',class:'axis-text'},String(yr)))}axes.append(make('text',{x:20,y:(Y0+Y1)/2,transform:`rotate(-90 20 ${(Y0+Y1)/2})`,'text-anchor':'middle',class:'axis-title'},'POPULATION'));axes.append(make('text',{x:(X0+X1)/2,y:455,'text-anchor':'middle',class:'axis-title'},'YEAR'));line.setAttribute('d',smoothPath(points()));hideTip();if(animate){line.style.transition='none';const len=line.getTotalLength();line.style.strokeDasharray=`${len}`;line.style.strokeDashoffset=`${len}`;requestAnimationFrame(()=>requestAnimationFrame(()=>{line.style.transition='stroke-dashoffset 950ms cubic-bezier(.2,.7,.2,1)';line.style.strokeDashoffset='0'}));}else{line.style.strokeDasharray='none';line.style.strokeDashoffset='0'}drawnOnce=true}
+    function activateRange(value){if(value==='all'){rangeStart=START;rangeEnd=END}else{rangeEnd=END;rangeStart=Math.max(START,END-Number(value))}document.querySelectorAll('.range').forEach(b=>{const active=b.dataset.range===value;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});selection.style.display='none';draw(true)}
+    function pos(evt){const r=svg.getBoundingClientRect();return{x:(evt.clientX-r.left)/r.width*960,y:(evt.clientY-r.top)/r.height*465}}
+    function showAt(x){const clamped=Math.max(X0,Math.min(X1,x)),year=rangeStart+(clamped-X0)/W*(rangeEnd-rangeStart),pop=interpolate(year),y=yFor(pop);cross.setAttribute('x1',clamped);cross.setAttribute('x2',clamped);cross.setAttribute('y1',Y0);cross.setAttribute('y2',Y1);cross.style.opacity='1';dot.setAttribute('cx',clamped);dot.setAttribute('cy',y);dot.style.opacity='1';tipYear.textContent=Math.round(year).toString();tipValue.textContent=`Population: ${fmt(pop)} (${short(pop)})`;const px=clamped/960*svg.getBoundingClientRect().width+wrap.offsetLeft,py=y/465*svg.getBoundingClientRect().height;tip.style.display='block';const tw=tip.offsetWidth,th=tip.offsetHeight;let left=px+13;if(left+tw>wrap.clientWidth-6)left=px-tw-13;tip.style.left=`${Math.max(4,left)}px`;tip.style.top=`${Math.max(th/2+4,Math.min(wrap.clientHeight-th/2-4,py))}px`}
+    hit.addEventListener('pointermove',e=>{const p=pos(e);if(dragging){const left=Math.min(dragStart,p.x),width=Math.abs(p.x-dragStart);selection.setAttribute('x',left);selection.setAttribute('width',width);selection.style.display=width>3?'block':'none';return}showAt(p.x)});
+    hit.addEventListener('pointerleave',()=>{if(!dragging)hideTip()});
+    hit.addEventListener('pointerdown',e=>{const p=pos(e);dragStart=Math.max(X0,Math.min(X1,p.x));dragging=true;selection.setAttribute('x',dragStart);selection.setAttribute('width',0);selection.style.display='block';hit.setPointerCapture?.(e.pointerId)});
+    hit.addEventListener('pointerup',e=>{if(!dragging)return;const p=pos(e),end=Math.max(X0,Math.min(X1,p.x));dragging=false;selection.style.display='none';if(Math.abs(end-dragStart)>16){const a=rangeStart+(Math.min(end,dragStart)-X0)/W*(rangeEnd-rangeStart),b=rangeStart+(Math.max(end,dragStart)-X0)/W*(rangeEnd-rangeStart);rangeStart=Math.max(START,a);rangeEnd=Math.min(END,b);document.querySelectorAll('.range').forEach(btn=>{btn.classList.remove('active');btn.setAttribute('aria-pressed','false')});draw(true)}else showAt(end);dragStart=null});
+    hit.addEventListener('pointercancel',()=>{dragging=false;selection.style.display='none';dragStart=null});
+    svg.addEventListener('dblclick',()=>activateRange('all'));
+    document.querySelectorAll('.range').forEach(b=>b.addEventListener('click',()=>activateRange(b.dataset.range)));
+    document.getElementById('resetChart').addEventListener('click',()=>activateRange('all'));
+    draw(true);
+    window.PEIChart={refresh:()=>draw(true)};
+  }
+})();
+</script>
+</body>
+</html>
